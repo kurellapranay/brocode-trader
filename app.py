@@ -138,4 +138,49 @@ notes = st.text_input("Why trade?")
 if st.button("Save Note"):
     st.success(f"Saved {symbol} Entry {entry}")
 
-# SKILL 
+# SKILL 11
+st.subheader("SKILL 11: Backtest")
+df['MA20'] = df['Close'].rolling(20).mean()
+df['MA50'] = df['Close'].rolling(50).mean()
+df['Signal'] = np.where(df['MA20'] > df['MA50'], 1, 0)
+df['Returns'] = df['Close'].pct_change()
+df['Strat'] = df['Signal'].shift(1) * df['Returns']
+total_ret = (1+df['Strat'].dropna()).prod() -1
+st.write(f"Strategy Return: {total_ret*100:.2f} %")
+
+# SKILL 12
+st.subheader("SKILL 12: Live Alert")
+if trend=="BULLISH" and rsi_val<65 and vol_ratio>1.2:
+    st.success(f"STRONG BUY SIGNAL for {symbol} NOW")
+else:
+    st.warning(f"No Alert - Trend {trend} RSI {rsi_val:.1f}")
+
+st.success("ALL 12 SKILLS LIVE ✅")
+# SKILL 13: LIVE AUTO ALERT - NO TELEGRAM NEEDED
+st.divider()
+st.subheader("SKILL 13: Live Auto Alert with Sound")
+
+# Auto refresh
+auto = st.checkbox("Enable LIVE 10 sec Auto-Refresh", value=False)
+if auto:
+    st.write("App will refresh every 60 seconds - Keep this tab open")
+    st.components.v1.html("<meta http-equiv='refresh' content='60'>", height=0)
+
+# Sound alert condition
+alert_condition = (trend=="BULLISH" and rsi_val<65 and vol_ratio>1.2) or (trend=="BEARISH" and rsi_val>65)
+
+if alert_condition:
+    st.error("🔔🔔🔔 ALERT TRIGGERED! STRONG SIGNAL NOW!")
+    # Sound
+    st.components.v1.html("""
+    <audio autoplay>
+      <source src="https://www.soundjay.com/buttons/sounds/beep-07a.mp3" type="audio/mpeg">
+    </audio>
+    <script>
+      alert('BROCODE TRADER ALERT: Strong Signal for """ + symbol + """ !');
+    </script>
+    """, height=0)
+else:
+    st.info(f"No alert now. Waiting for: Bullish + RSI<65 + Vol>1.2x. Current: {trend}, RSI {rsi_val:.1f}")
+
+st.success("Skill 13 LIVE - No Telegram needed!")
